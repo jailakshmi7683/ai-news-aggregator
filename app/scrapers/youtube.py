@@ -40,13 +40,29 @@ def get_latest_videos(channel_id: str, hours: int = 24) -> list[dict]:
     return videos
 
 
+# def get_transcript(video_id: str) -> Optional[str]:
+#     try:
+#         transcript = YouTubeTranscriptApi().fetch(video_id)
+#         return " ".join(snippet.text for snippet in transcript)
+#     except (TranscriptsDisabled, NoTranscriptFound):
+#         return None
+#     except Exception:
+#         return None
+
 def get_transcript(video_id: str) -> Optional[str]:
+    api = YouTubeTranscriptApi()
     try:
-        transcript_list = YouTubeTranscriptApi.get_transcript(video_id)
-        return " ".join([entry["text"] for entry in transcript_list])
-    except (TranscriptsDisabled, NoTranscriptFound):
-        return None
-    except Exception:
+        return " ".join(s.text for s in api.fetch(video_id))
+    except NoTranscriptFound:
+        # no English track: use the first available one (e.g. auto-generated Hindi)
+        try:
+            transcript = next(iter(api.list(video_id)))
+            return " ".join(s.text for s in transcript.fetch())
+        except Exception as e:
+            print(f"Transcript error for {video_id}: {type(e).__name__}")
+            return None
+    except Exception as e:
+        print(f"Transcript error for {video_id}: {type(e).__name__}")
         return None
 
 
@@ -59,7 +75,9 @@ def scrape_channel(channel_id: str, hours: int = 150) -> list[dict]:
 
 if __name__ == "__main__":
     #videos = get_latest_videos(channel_id="UCn8ujwUInbJkBhffxqAPBVQ", hours=24*9) #creator ID
-    videos = get_latest_videos(channel_id="UCBwmMxybNva6P_5VmxjzwqA", hours=24*9) #APNA COLLEGE
-    transcripts = scrape_channel(channel_id="UCBwmMxybNva6P_5VmxjzwqA", hours=24*9)
-    print(videos);
-    print(transcripts);
+    # videos = get_latest_videos(channel_id="UCBwmMxybNva6P_5VmxjzwqA", hours=24*9) #APNA COLLEGE
+    # print(videos);
+    videos = scrape_channel(channel_id="UCBwmMxybNva6P_5VmxjzwqA", hours=24)
+    for v in videos:
+        print(v["published_at"].date(), v["title"])
+        print("  transcript chars:", len(v["transcript"]) if v["transcript"] else 0)
