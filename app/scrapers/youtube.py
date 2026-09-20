@@ -3,6 +3,7 @@ from typing import Optional
 import feedparser
 from youtube_transcript_api import YouTubeTranscriptApi
 from youtube_transcript_api._errors import TranscriptsDisabled, NoTranscriptFound
+from app.services.youtube import get_transcript
 
 
 def get_rss_url(channel_id: str) -> str:
@@ -38,32 +39,6 @@ def get_latest_videos(channel_id: str, hours: int = 24) -> list[dict]:
             })
 
     return videos
-
-
-# def get_transcript(video_id: str) -> Optional[str]:
-#     try:
-#         transcript = YouTubeTranscriptApi().fetch(video_id)
-#         return " ".join(snippet.text for snippet in transcript)
-#     except (TranscriptsDisabled, NoTranscriptFound):
-#         return None
-#     except Exception:
-#         return None
-
-def get_transcript(video_id: str) -> Optional[str]:
-    api = YouTubeTranscriptApi()
-    try:
-        return " ".join(s.text for s in api.fetch(video_id))
-    except NoTranscriptFound:
-        # no English track: use the first available one (e.g. auto-generated Hindi)
-        try:
-            transcript = next(iter(api.list(video_id)))
-            return " ".join(s.text for s in transcript.fetch())
-        except Exception as e:
-            print(f"Transcript error for {video_id}: {type(e).__name__}")
-            return None
-    except Exception as e:
-        print(f"Transcript error for {video_id}: {type(e).__name__}")
-        return None
 
 
 def scrape_channel(channel_id: str, hours: int = 150) -> list[dict]:
