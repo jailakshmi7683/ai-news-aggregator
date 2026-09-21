@@ -8,3 +8,12 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Editor / OS
+.vscode/
+.DS_Store

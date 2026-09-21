@@ -9,6 +9,7 @@ dependencies = [
     "feedparser>=6.0.14",
     "openai>=3.16.2",
     "psycopg2-binary>=2.9.13",
+    "pydantic>=2.13.5",
     "python-dotenv>=1.2.3",
     "requests>=2.34.2",
     "sqlalchemy>=2.0.54",
