@@ -66,7 +66,11 @@ class AnthropicScraper:
         try:
             response = requests.get(url, headers=HEADERS, timeout=15)
             response.raise_for_status()
-            return convert(response.text)
+            result = convert(response.text)
+
+            if isinstance(result, str):
+                return result
+            return getattr(result, "content", None)
         except Exception as e:
             print(f"Markdown conversion failed for {url}: {type(e).__name__}: {e}")
             return None

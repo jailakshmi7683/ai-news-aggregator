@@ -14,5 +14,5 @@ def main(hours: int = 24):
 
 if __name__ == "__main__":
     import sys
-    hours = int(sys.argv[1]) if len(sys.argv) > 1 else 24
+    hours = int(sys.argv[1]) if len(sys.argv) > 1 else 24*10
     main(hours=hours)
